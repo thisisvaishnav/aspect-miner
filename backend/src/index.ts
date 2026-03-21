@@ -18,6 +18,10 @@ app.get("/api/health", (_req, res) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
-app.listen(PORT, () => {
-  console.log(`[AspectMiner API] Running on http://localhost:${PORT}`);
-});
+if (process.env.VERCEL !== "1") {
+  app.listen(PORT, () => {
+    console.log(`[AspectMiner API] Running on http://localhost:${PORT}`);
+  });
+}
+
+export default app;
