@@ -7,7 +7,13 @@ const TARGET_ASPECTS = [
   "performance",
   "design",
   "screen",
+  "display",
   "software",
+  "speaker",
+  "audio",
+  "sound",
+  "microphone",
+  "mic",
 ];
 
 const POSITIVE_WORDS = [
@@ -87,6 +93,24 @@ const analyzeReview = (text: string): AnalysisResponse => {
 
     aspectsFound.push({ aspect: word, polarity, score: sentimentScore });
   });
+
+  if (aspectsFound.length === 0) {
+    let overallScore = 0;
+    words.forEach((w) => {
+      if (POSITIVE_WORDS.includes(w)) overallScore += 1;
+      if (NEGATIVE_WORDS.includes(w)) overallScore -= 1;
+    });
+    const hasNegationGlobal = words.some((w) => NEGATION_WORDS.includes(w));
+    if (hasNegationGlobal) {
+      overallScore *= -1;
+    }
+    if (overallScore !== 0) {
+      let polarity: Polarity = "Neutral";
+      if (overallScore > 0) polarity = "Positive";
+      if (overallScore < 0) polarity = "Negative";
+      aspectsFound.push({ aspect: "overall_feedback", polarity, score: overallScore });
+    }
+  }
 
   return {
     original_text: text,

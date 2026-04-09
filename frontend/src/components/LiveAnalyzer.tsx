@@ -48,9 +48,17 @@ const LiveAnalyzer = () => {
 
     setIsGeneratingReply(true);
     try {
-      const prompt = `A customer left this review: "${inputText}". Our aspect-mining system extracted these opinions: ${JSON.stringify(
-        analysisResult.aspects
-      )}. Draft a short, polite, professional, and empathetic response from our customer support team acknowledging their specific positive and negative points. Keep it concise.`;
+      const aspectsJson = JSON.stringify(analysisResult.aspects);
+      const prompt = `A customer left this review: "${inputText}".
+
+Our aspect-mining system extracted these opinion labels (may be empty or include an "overall_feedback" row when no product aspect keywords matched): ${aspectsJson}.
+
+Draft a short, polite, professional, empathetic reply from customer support.
+
+Rules:
+- If structured aspects are empty, still respond fully based only on the review wording.
+- If the review is only positive or only negative, do not invent the opposite.
+- Use exactly two parts separated by a blank line: first part thanks them and acknowledges what they said; second part is a brief closing (e.g. we're glad it helped, or we're here if they need anything). Keep each part to one or two sentences.`;
 
       const reply = await generateAiContent(prompt, "You are a professional customer support agent.");
       setAiReply(reply);
